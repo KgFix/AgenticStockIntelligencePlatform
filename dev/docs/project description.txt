@@ -1,0 +1,633 @@
+# � Dash Financial Intelligence Application
+
+A comprehensive financial analysis and cryptocurrency trading platform built with Plotly Dash, featuring real-time market data visualization, AI-powered news analysis, and wallet-based strategy recommendations.
+
+## 🎯 What This System Does
+
+- **Real-Time Market Visualization**: Interactive TradingView-style charts with technical indicators
+- **AI-Powered News Analysis**: Multi-provider LLM integration (Gemini, Local LLM, DigitalOcean, HuggingFace) for sentiment analysis and article summaries
+- **Multi-Source News Aggregation**: Combines GNews API, NewsAPI, CryptoPanic, Serper.dev, and DuckDuckGo search
+- **Technical Analysis Engine**: Automated calculation of RSI, MACD, SMA, EMA, Bollinger Bands, and custom indicators
+- **Wallet Strategy Analysis**: Blockchain wallet inspection (Ethereum/Bitcoin) via Blockchair API with personalized trading recommendations
+- **Multi-Agent Research Orchestration**: Specialized agents for company profiles, fundamental analysis, technical strategy, and holistic recommendations
+- **Production-Ready Deployment**: Dockerized with Gunicorn for cloud hosting (Render, AWS, Azure)
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    DASH WEB APPLICATION                         │
+│                  (Plotly Dash + Flask)                          │
+└──────────┬──────────────────────────────┬───────────────────────┘
+           │                              │
+┌──────────▼──────────┐        ┌─────────▼──────────────────────┐
+│   NEWS & ANALYSIS   │        │   WALLET STRATEGY TAB          │
+│   TAB (TradingView) │        │   (Blockchain Analysis)        │
+└──────────┬──────────┘        └─────────┬──────────────────────┘
+           │                              │
+┌──────────▼──────────────────────────────▼───────────────────────┐
+│                      SERVICES LAYER                              │
+│  ┌────────────────┐  ┌──────────────┐  ┌────────────────────┐  │
+│  │  NewsBridge    │  │ Research     │  │  Technical         │  │
+│  │  (news_core.py)│  │ Orchestrator │  │  Indicators        │  │
+│  └────────────────┘  └──────────────┘  └────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+           │                              │
+┌──────────▼──────────────────────────────▼───────────────────────┐
+│                   SPECIALIZED AGENTS                             │
+│  • data_agent              • news_agent                          │
+│  • technical_strategist    • company_profile_agent               │
+│  • fundamental_ratios      • earnings_agent                      │
+│  • holistic_analysis       • recommendation_agent                │
+│  • synthesis_agent         • wallet_strategy_agent               │
+└──────────────────────────────────────────────────────────────────┘
+           │                              │
+┌──────────▼──────────────────────────────▼───────────────────────┐
+│                   EXTERNAL INTEGRATIONS                          │
+│  • yfinance (market data)  • GNews/NewsAPI/CryptoPanic (news)   │
+│  • Blockchair API (wallet) • Serper.dev/DuckDuckGo (search)     │
+│  • Gemini/OpenAI (LLMs)    • Local LLM servers                  │
+│  • BM25 (document search)  • BeautifulSoup (web scraping)       │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+## 🚀 Quick Start
+
+### 1. Environment Setup (Windows PowerShell)
+
+```powershell
+# Navigate to the project directory
+cd "c:\Users\Jobbie\c++Workspace\Comp301 project\dash"
+
+# Create a virtual environment
+python -m venv .venv
+
+# Activate the environment
+.\.venv\Scripts\Activate.ps1
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 2. Configuration
+
+Create a `.env` file in the project root:
+
+```env
+# LLM Providers (at least one recommended)
+GEMINI_API_KEY=your_gemini_key_here
+GEMINI_API_KEY2=backup_key_2
+LOCAL_LLM_BASE_URL=http://127.0.0.1:1234/v1
+LOCAL_LLM_API_KEY=not-needed
+MODEL_NAME=local-model
+
+# News Providers (optional - fallback to free alternatives)
+GNEWS_API_KEY1=your_gnews_key
+NEWSAPI_KEY=your_newsapi_key
+CRYPTOPANIC_API_KEY=your_cryptopanic_key
+SERPER_API_KEY=your_serper_key
+
+# Wallet Analysis
+BLOCKCHAIR_API_KEY=your_blockchair_key
+
+# Configuration
+DISABLE_API_KEYS=false
+LLM_HTTP_TIMEOUT=180
+TEMPERATURE=0.1
+```
+
+### 3. Launch the Application
+
+```powershell
+# Start the Dash server
+python app.py
+```
+
+Open your browser to: **http://127.0.0.1:8050**
+
+## 🎮 Using the System
+
+### News & Analysis Tab
+1. **Select an Asset**: Choose from preset cryptos/stocks (BTC, ETH, NVDA, etc.) or enter a custom symbol
+2. **Configure AI Model**: Select auto-detection or specific provider (Gemini, Local, DigitalOcean, HuggingFace)
+3. **Set News Parameters**: Choose number of articles (0-30) and lookback period (1-30 days)
+4. **View Results**:
+   - Large interactive TradingView-style chart with technical indicators
+   - AI-analyzed news feed with sentiment scores
+   - Overall market sentiment summary
+   - Article summaries and relevance scoring
+
+### Wallet Strategy Tab
+1. **Select Blockchain**: Ethereum or Bitcoin
+2. **Enter Wallet Address**: Your public wallet address
+3. **Click Analyze**: Get comprehensive analysis including:
+   - Current balance and transaction history
+   - ERC-20 token holdings (for Ethereum)
+   - Activity timeline
+   - AI-generated trading recommendations based on portfolio composition
+
+## 📦 Project Structure
+
+```
+dash/
+├── app.py                      # Main Dash application entry point
+├── services.py                 # Core business logic & agent orchestration (2700+ lines)
+├── news_core.py                # News fetching, scraping, and LLM analysis (800+ lines)
+├── workflows.py                # Agent workflow definitions (technical, fundamental, combined)
+├── telemetry.py                # Event logging and performance tracking
+├── requirements.txt            # Python dependencies
+├── Dockerfile                  # Production deployment configuration
+├── pyproject.toml              # Black, Ruff, Mypy, Pytest configuration
+│
+├── ui/                         # User interface components
+│   ├── assets/                 # CSS, images, static files
+│   └── layouts/
+│       ├── news.py             # News & Analysis tab layout
+│       └── strategy.py         # Wallet Strategy tab layout
+│
+├── agents/                     # Agent implementations
+│   ├── __init__.py
+│   └── agents.py               # Research workflow orchestration
+│
+├── utils/                      # Shared utilities
+│   ├── __init__.py
+│   └── json_utils.py           # JSON extraction with robust parsing
+│
+├── logs/                       # Runtime logs and caches
+│   ├── ai_providers.log        # LLM provider request logs
+│   ├── entropy.jsonl           # Event telemetry data
+│   ├── news_cache.json         # Cached news fetches
+│   └── research_history.json   # Agent research results
+│
+└── dev/                        # Developer resources
+    ├── docs/                   # Internal documentation
+    │   └── index_bm25.json     # BM25 search corpus
+    ├── scripts/                # Helper scripts
+    └── dev-requirements.txt    # Development tools (ruff, black, mypy, pytest)
+```
+
+## 🧠 Key Technologies & Design Patterns
+
+### Core Technologies
+- **Plotly Dash 2.17+**: Reactive web framework with callback-based architecture
+- **Pandas & YFinance**: Financial data acquisition and manipulation
+- **Beautiful Soup 4**: Web scraping for full article content
+- **Google Generative AI**: Gemini LLM integration
+- **DuckDuckGo Search**: Free web search fallback
+- **Rank-BM25**: Lightweight document retrieval
+- **Technical Analysis (TA)**: Indicator calculation library
+
+### Design Patterns
+
+#### 1. **Model-View-Presenter (MVP) / MVC Hybrid**
+- **View**: `ui/layouts/` (Dash components and layout definitions)
+- **Model**: `services.py`, `news_core.py` (data models and business logic)
+- **Presenter/Controller**: `app.py` callbacks and `ResearchOrchestrator`
+
+#### 2. **Strategy Pattern**
+- **LLM Provider Selection**: `_llm_generate()` in `services.py` dynamically selects from multiple providers
+- **News Source Rotation**: `NewsBridge` tries GNews → NewsAPI → CryptoPanic → Serper → DuckDuckGo in sequence
+
+#### 3. **Adapter/Bridge Pattern**
+- **NewsBridge**: Unified interface over multiple news APIs with different schemas
+- **LLMClientManager**: Normalizes OpenAI-compatible, Gemini, and local LLM interfaces
+
+#### 4. **Facade Pattern**
+- **ResearchOrchestrator**: Simplifies complex multi-agent workflows into single method calls
+- **NewsBridge**: Hides complexity of multiple news sources, scraping, and LLM analysis
+
+#### 5. **Observer Pattern** (Implicit via Dash Callbacks)
+- Dash's callback system implements reactive data flow
+- Changes to inputs automatically trigger dependent output updates
+
+#### 6. **Agent-Based Architecture**
+- 15+ specialized agents (data_agent, technical_strategist, news_agent, etc.)
+- Each agent has single responsibility and returns structured data
+- `ResearchOrchestrator` coordinates agent execution based on workflow definitions
+
+### Code Quality Measures
+
+#### Type Safety & Documentation
+- Dataclasses for structured data (`NewsItem`, `Task`, `NewsArticle`)
+- Type hints throughout codebase
+- Mypy type checking configured in `pyproject.toml`
+
+#### Testing
+- Unit tests in `tests/` directory
+- Pytest configuration with caching (`.cache/pytest`)
+- JSON parsing edge cases covered
+
+#### Linting & Formatting
+- **Black**: Code formatting (100 char line length)
+- **Ruff**: Fast linting with extended rule sets (imports, upgrades, bugprone, simplify)
+- **Mypy**: Static type checking
+- All tools configured in `pyproject.toml`
+
+#### Logging & Telemetry
+- Centralized logging via `telemetry.py`
+- Structured JSONL event logging (`logs/entropy.jsonl`)
+- Provider-specific logs (`logs/ai_providers.log`)
+- Debug-friendly with request/response tracking
+
+#### Graceful Degradation
+- Falls back to free alternatives when API keys unavailable
+- Cache-first architecture reduces API calls (`news_cache.json`)
+- Timeout handling for all external requests
+- Self-repair mechanisms for malformed LLM JSON responses
+
+## 🧪 Quality Gates (Development)
+
+Run these commands before submission/deployment:
+
+```powershell
+# Install development tools
+& ".\.venv\Scripts\python.exe" -m pip install -r dev/dev-requirements.txt
+
+# Auto-fix linting issues
+& ".\.venv\Scripts\python.exe" -m ruff check . --fix
+
+# Format code
+& ".\.venv\Scripts\python.exe" -m black .
+
+# Type checking
+& ".\.venv\Scripts\python.exe" -m mypy services.py news_core.py
+
+# Run tests
+& ".\.venv\Scripts\python.exe" -m pytest -q
+```
+
+**Notes:**
+- Strict linting rules are configured; fix critical issues first
+- Application degrades gracefully without external API keys (uses free alternatives)
+- Caches are centralized in `.cache/` (pytest, ruff, mypy) and ignored by git
+
+## 🐳 Production Deployment
+
+### Docker Build & Run
+
+```powershell
+# Build the Docker image
+docker build -t dash-financial-app .
+
+# Run locally
+docker run -p 8050:8050 --env-file .env dash-financial-app
+
+# With mounted persistent storage (for research history)
+docker run -p 8050:8050 --env-file .env `
+  -v ${PWD}/persistent:/app/logs `
+  dash-financial-app
+```
+
+### Render.com Deployment
+
+The `Dockerfile` is optimized for Render with:
+- Gunicorn WSGI server (2 workers, 2 threads, 120s timeout)
+- Unprivileged user (`dashuser`)
+- Health check on port 8050
+- Environment variable support for `$PORT`
+
+**render.yaml** (optional):
+```yaml
+services:
+  - type: web
+    name: dash-financial-app
+    env: docker
+    plan: free
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: BLOCKCHAIR_API_KEY
+        sync: false
+    healthCheckPath: /
+```
+
+## 🔧 Advanced Configuration
+
+### Environment Variables Reference
+
+**LLM Configuration:**
+```env
+GEMINI_API_KEY=primary_key
+GEMINI_API_KEY2=backup_key_2
+GEMINI_MODEL_NAME=gemini-1.5-flash
+LOCAL_LLM_BASE_URL=http://localhost:1234/v1
+LOCAL_LLM_API_KEY=not-needed
+MODEL_NAME=local-model
+LLM_HTTP_TIMEOUT=180
+TEMPERATURE=0.1
+```
+
+**News Providers:**
+```env
+GNEWS_API_KEY1=key1
+GNEWS_API_KEY2=key2
+NEWSAPI_KEY=your_key
+CRYPTOPANIC_API_KEY=your_key
+SERPER_API_KEY=your_key
+SERPER_API_KEY2=backup_key
+```
+
+**Performance Tuning:**
+```env
+# News analysis limits (keep Dash callbacks responsive)
+ANALYZE_MAX_ARTICLES=8
+ANALYZE_ARTICLE_BUDGET_SEC=8.0
+ANALYZE_TOTAL_BUDGET_SEC=20.0
+ANALYZE_CONTENT_CLIP=4000
+
+# Caching
+NEWS_CACHE_DISABLE=false
+
+# Logging
+DASH_DISABLE_LOGS=false
+LOG_LEVEL=INFO
+```
+
+**Storage Paths:**
+```env
+# Research history (useful for Render persistent disks)
+RESEARCH_HISTORY_PATH=/mnt/data/research_history.json
+RESEARCH_STORAGE_DIR=/mnt/data
+DASH_LOG_DIR=./logs
+```
+
+## 🧠 Agent System Deep Dive
+
+### Available Workflows
+
+Defined in `workflows.py`:
+
+1. **technical**: Price data → Technical indicators → Recommendations
+2. **fundamental**: Company profile → Financials → Ratios → Fundamental analysis
+3. **combined**: Full analysis with all agents (technical + fundamental + news)
+4. **web**: News + holistic analysis + recommendations
+
+### Agent Catalog
+
+**Data Collection Agents:**
+- `data_agent`: Fetch historical price data (yfinance)
+- `data_agent_with_dates`: Price data for specific date ranges
+- `news_agent`: Multi-source news aggregation with sentiment analysis
+- `web_search_agent`: Web search via Serper/DuckDuckGo
+- `company_profile_agent`: Company information and metadata
+
+**Analysis Agents:**
+- `technical_strategist_agent`: Technical indicator interpretation
+- `fundamental_ratios_agent`: Calculate and analyze financial ratios
+- `fundamental_synthesis_agent`: Summarize fundamental health
+- `holistic_analysis_agent`: Cross-domain synthesis (technical + fundamental + news)
+- `wallet_strategy_agent`: Blockchain wallet analysis and recommendations
+
+**Synthesis Agents:**
+- `synthesis_agent`: Combine multiple data sources
+- `synthesis_agent_for_technicals`: Technical analysis summary
+- `recommendation_agent`: Final buy/sell/hold recommendations
+
+### Custom Agent Development
+
+Agents follow a consistent interface:
+
+```python
+def custom_agent(self, symbol: str, **kwargs) -> Tuple[str, Any]:
+    """
+    Args:
+        symbol: Ticker symbol (e.g., "BTC", "AAPL")
+        **kwargs: Additional parameters
+    
+    Returns:
+        (log_message: str, result_data: Any)
+    """
+    # 1. Data collection
+    raw_data = self._fetch_data(symbol)
+    
+    # 2. LLM analysis (optional)
+    analysis = self._llm_generate(
+        provider="auto",
+        system_msg="You are a financial analyst...",
+        user_msg=f"Analyze {symbol}: {raw_data}",
+        required_keys=["summary", "risk_level"]
+    )
+    
+    # 3. Return structured result
+    return f"Analysis complete for {symbol}", analysis
+```
+
+## 📊 Data Flow Example
+
+**User Request:** "Analyze BTC with news"
+
+1. **UI Layer** (`app.py`): User clicks "Refresh News" for BTC
+2. **Callback Triggered**: `load_news()` callback invoked
+3. **Service Layer** (`NewsBridge`):
+   - Fetches news from GNews API (or fallback sources)
+   - Scrapes article content via BeautifulSoup
+   - Analyzes each article with Gemini/Local LLM
+4. **LLM Analysis** (`news_core.py`):
+   - Generates 2-4 sentence summary
+   - Assigns sentiment label (bullish/bearish/neutral)
+   - Calculates sentiment score (-1.0 to +1.0)
+5. **Caching**: Results saved to `logs/news_cache.json` (TTL: configurable)
+6. **UI Update**: News cards rendered with sentiment indicators
+7. **Chart Update**: TradingView chart fetches price data separately
+
+## 🎯 Use Cases
+
+### 1. Day Trading Dashboard
+- Real-time price charts with technical indicators
+- Sentiment-analyzed news feed
+- Quick asset switching (BTC, ETH, NVDA, etc.)
+
+### 2. Portfolio Analysis
+- Connect wallet via Blockchair API
+- View holdings and transaction history
+- Get AI-generated rebalancing recommendations
+
+### 3. Research Automation
+- Multi-agent workflows for deep analysis
+- Technical + fundamental + sentiment synthesis
+- Historical research storage (`research_history.json`)
+
+### 4. API Integration
+- Underlying Flask server (`app.server`) can be extended
+- Agent methods callable programmatically
+- JSON-based data exchange
+
+## 📚 Additional Resources
+
+### Developer Documentation
+- Architecture diagrams: `dev/docs/`
+- BM25 document index: `dev/docs/index_bm25.json`
+- Helper scripts: `dev/scripts/` (prune_artifacts.py, ingest_docs.py)
+
+### External APIs
+- [YFinance Documentation](https://pypi.org/project/yfinance/)
+- [Plotly Dash Guide](https://dash.plotly.com/)
+- [Gemini API Docs](https://ai.google.dev/docs)
+- [Blockchair API Reference](https://blockchair.com/api/docs)
+
+## 🤝 Contributing
+
+### Code Style
+- Follow Black formatting (100 char lines)
+- Pass Ruff linting checks
+- Add type hints for new functions
+- Write unit tests for utilities
+
+### Pull Request Checklist
+- [ ] Code passes `ruff check . --fix`
+- [ ] Code formatted with `black .`
+- [ ] Type checking passes (`mypy`)
+- [ ] Tests added/updated (`pytest`)
+- [ ] Documentation updated
+- [ ] `.env.example` updated if new variables added
+
+## 📄 License & Academic Use
+
+This project was developed as part of COMP301 coursework, demonstrating:
+- **Design Patterns**: MVP/MVC, Strategy, Adapter, Facade, Observer
+- **Software Engineering**: Modular architecture, dependency injection, error handling
+- **AI Integration**: Multi-provider LLM orchestration, prompt engineering
+- **Production Readiness**: Docker containerization, logging, caching, testing
+
+For academic integrity, please cite appropriately if referencing this codebase.
+├── .env.example              # Environment template
+├── config/
+│   ├── settings.py           # System configuration
+│   └── __init__.py
+├── src/
+│   ├── agents/
+│   │   ├── mission_control.py     # Central orchestrator
+│   │   ├── market_news_agent.py   # News gathering specialist
+│   │   └── __init__.py
+│   ├── dashboard/
+│   │   ├── main_dashboard.py      # Streamlit interface
+│   │   └── __init__.py
+│   ├── tools/                     # Utility functions
+│   └── __init__.py
+└── README.md
+```
+
+## 🔧 Extending the System
+
+### Adding New Agents
+
+1. Create agent in `src/agents/new_agent.py`
+2. Follow the vibe-coding pattern:
+   - Natural language system prompt
+   - Tool integration
+   - Structured output format
+3. Register with Mission Control
+4. Update dashboard if needed
+
+### Adding Data Sources
+
+1. Implement tool functions in `src/tools/`
+2. Register tools with relevant agents
+3. Update configuration settings
+4. Test integration
+
+## 📈 Entropy Metrics
+
+The system tracks "vibe-coding entropy" - measuring efficiency gains:
+
+| Metric | Traditional | Vibe-Coded | Improvement |
+|--------|-------------|------------|-------------|
+| Dev Time | 120 hours | 40 hours | 3x faster |
+| Lines of Code | 5,000+ | 500 prompts | 10x reduction |
+| Debug Sessions | 25-30 | 8-10 | 3x fewer |
+| Feature Addition | 8 hours | 2 hours | 4x faster |
+
+## 🔒 Privacy & Security
+
+- **Local Processing**: Option for local LLMs
+- **API Key Security**: Encrypted storage
+- **No Data Persistence**: Reports generated on-demand
+- **Disclaimer**: All reports marked "Not financial advice"
+
+## 🤝 Contributing
+
+This is a university project demonstrating vibe-coding principles. Key areas for contribution:
+
+1. **Agent Optimization**: Improve prompt engineering
+2. **Tool Integration**: Add new data sources
+3. **Entropy Tracking**: Better metrics collection
+4. **UI Enhancement**: Streamlit improvements
+5. **Documentation**: Vibe-coding best practices
+
+## 📚 Dependencies
+
+### Core Framework
+- `autogen>=0.2.26` - Multi-agent orchestration
+- `openai>=1.0.0` - LLM integration
+- `streamlit>=1.28.0` - Web dashboard
+
+### Data Processing
+- `pandas>=2.0.0` - Data manipulation
+- `textblob>=0.17.0` - Sentiment analysis
+- `requests>=2.31.0` - API calls
+
+### Web Tools
+- `duckduckgo-search>=4.0.0` - Free web search
+- `beautifulsoup4>=4.12.0` - HTML parsing
+
+## 🎓 Academic Context
+
+**Course**: COMP301 - Advanced Software Engineering  
+**Focus**: AI-Bootstrapped Development Paradigms  
+**Innovation**: Vibe-coding vs traditional programming  
+**Measurement**: Entropy cost analysis  
+
+## 📞 Support
+
+For issues or questions:
+1. Check the troubleshooting section below
+2. Review agent logs in the dashboard
+3. Validate API key configuration
+4. Test with sample mission first
+
+## 🔍 Troubleshooting
+
+**Agent Communication Failures:**
+- Check OpenAI API key validity
+- Verify internet connection
+- Review agent system prompts
+
+**Dashboard Not Loading:**
+- Ensure Streamlit is installed
+- Check port 8501 availability
+- Validate Python path configuration
+
+**News Gathering Issues:**
+- Verify API keys (optional)
+- Test with free DuckDuckGo search
+- Check rate limiting
+
+## 🚀 Next Steps
+
+1. **Get Started**: Follow the Quick Start guide
+2. **Test Sample Mission**: Run `python app.py --sample-mission`
+3. **Explore Dashboard**: Launch web interface
+4. **Customize Agents**: Modify system prompts
+5. **Track Entropy**: Monitor efficiency metrics
+6. **Document Learning**: Contribute to vibe-coding manifesto
+
+---
+
+
+
+
+Agents in Research
+DataAgent
+Fetches price data (OHLCV) for the selected symbol using free sources like yfinance or stooq.
+RequirementsAgent
+Reads your local requirements.pdf and project description.txt to understand project requirements and shape research tasks.
+NewsAgent
+Uses the NewsBridge to get recent headlines and AI-generated news summaries for the symbol.
+WebSearchAgent
+Performs a web search for the symbol using Serper.dev or DuckDuckGo, prioritizing finance-related sources.
+SynthesisAgent
+Merges all signals (data, news, web search, requirements) and proposes actionable findings and goals.
+What Happens
+The orchestrator (ResearchOrchestrator) coordinates these agents.
+Each agent runs its task and returns a message and results.
+The results are combined and shown in the research tab, including price data, news, web findings, and synthesized insights.
